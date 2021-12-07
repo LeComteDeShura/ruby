@@ -1,16 +1,17 @@
 require_relative '../abstract/state'
 require_relative './converter'
-require_relative './outputSimularName'
+require_relative './output_simular_name'
 # require '../abstract/context'
 
 class InputName < State
   def initialize
+    super()
     @a = ''
   end
 
   def do
-    @a = STDIN.getch
-    @context.coin(@a)
+    @a = $stdin.getch
+    @context.gcoin(@a)
   end
 
   def next

@@ -7,7 +7,7 @@ class InputValue < State
   def do
     system 'clear'
     print 'Enter amount to convert: '
-    STDOUT.flush
+    $stdout.flush
     @context.value = $stdin.gets.chomp
   end
 

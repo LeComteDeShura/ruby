@@ -1,6 +1,6 @@
 require_relative '../abstract/state'
 require_relative './converter'
-require_relative './inputName'
+require_relative './input_name'
 # require '../abstract/context'
 
 class OutputSimularNames < State
@@ -16,7 +16,7 @@ class OutputSimularNames < State
   def do
     system 'clear'
 
-    puts 'Input ticker: ' + @context.coin
+    puts "Input ticker: #{@context.coin}"
     puts 'similar names: '
     @context.getSimilarNames
     printSimilarNames
