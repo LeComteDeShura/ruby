@@ -1,31 +1,33 @@
 require_relative '../src/states/is_right_name'
 
 describe IsRightName do
-  describe '#do' do
-    context 'stdin.getch y' do
-      it 'transition_to SetFirstCoin' do
-        context = Converter.new(IsRightName.new)
-        context.similarNames = []
-        context.similarNames.push 'test'
-        $stdin.should_receive(:getch).and_return('y')
-        expect(context.state.is_a?(IsRightName)).to eq true
+  describe '#next' do
+    context 'when pressed \'y\'' do
+      let(:context) { Converter.new IsRightName.new }
+      let(:input) { StringIO.new('y') }
+
+      before do
+        $stdin = input
         context.do
         context.next
-        expect(context.state.is_a?(SetFirstCoin)).to eq true
       end
+
+      subject { context.state }
+      it { is_expected.to be_a SetCoin }
     end
 
-    context 'stdin.getch n' do
-      it 'transition_to SetFirstCoin' do
-        context = Converter.new(IsRightName.new)
-        context.similarNames = []
-        context.similarNames.push 'test'
-        $stdin.should_receive(:getch).and_return('n')
-        expect(context.state.is_a?(IsRightName)).to eq true
+    context 'when pressed \'n\'' do
+      let(:context) { Converter.new IsRightName.new }
+      let(:input) { StringIO.new('n') }
+
+      before do
+        $stdin = input
         context.do
         context.next
-        expect(context.state.is_a?(SetFirstCoin)).to eq true
       end
+
+      subject { context.state }
+      it { is_expected.to be_a SetCoin }
     end
   end
 end

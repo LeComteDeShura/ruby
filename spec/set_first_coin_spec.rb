@@ -1,56 +1,49 @@
 require_relative '../src/states/is_right_name'
+require_relative '../src/states/set_coin'
 
-describe IsRightName do
-  describe '#do' do
-    context ' ' do
-      it 'transition_to SetSecondCoin' do
-        context = Converter.new(SetFirstCoin.new)
-        expect(context.state.is_a?(SetFirstCoin)).to eq true
-        context.coins.push 'test'
-        context.coin = 'test'
-        context.similarNames = []
-        context.similarNames.push 'asd'
+describe SetCoin do
+  describe '#next' do
+    context 'when user input does not match the list' do
+      let(:context) { Converter.new SetCoin.new }
+
+      before do
+        context.current_coin = 'test'
+        context.similar_names.push 'test1'
+        context.do
         context.next
-        expect(context.state.is_a?(SetSecondCoin)).to eq true
       end
+
+      subject { context.state }
+      it { is_expected.to be_a IsRightName }
     end
 
-    context ' ' do
-      it 'transition_to IsRightName' do
-        context = Converter.new(SetFirstCoin.new)
-        expect(context.state.is_a?(SetFirstCoin)).to eq true
-        context.coin = 'test'
-        context.similarNames = []
-        context.similarNames.push 'asd'
+    context 'when first coin was chosen' do
+      let(:context) { Converter.new SetCoin.new }
+
+      before do
+        context.current_coin = 'test'
+        context.similar_names.push 'test'
+        context.do
         context.next
-        expect(context.state.is_a?(IsRightName)).to eq true
       end
+
+      subject { context.state }
+      it { is_expected.to be_a Output }
     end
 
-    context ' ' do
-      it 'transition_to InputName' do
-        context = Converter.new(SetFirstCoin.new)
-        expect(context.state.is_a?(SetFirstCoin)).to eq true
-        # context.coins.push 'test'
-        # context.coin = 'test'
-        context.similarNames = []
-        context.similarNames.push 'asd'
-        context.next
-        expect(context.state.is_a?(InputName)).to eq true
-      end
-    end
+    context 'when second coin was chosen' do
+      let(:context) { Converter.new SetCoin.new }
 
-    context ' ' do
-      it 'transition_to SetSecondCoin' do
-        context = Converter.new(SetFirstCoin.new)
-        expect(context.state.is_a?(SetFirstCoin)).to eq true
-        # context.coins.push 'test'
-        context.coin = 'test'
-        context.similarNames = []
-        context.similarNames.push 'test'
+      before do
+        context.current_coin = 'test'
+        context.from_coin = 'test'
+        context.similar_names.push 'test'
+        context.do
         context.next
-        expect(context.state.is_a?(SetSecondCoin)).to eq true
       end
+
+      subject { context.state }
+      it { is_expected.to be_a InputValue }
     end
   end
 end

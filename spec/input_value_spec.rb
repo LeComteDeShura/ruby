@@ -1,29 +1,33 @@
 require_relative '../src/states/input_value'
 
 describe InputValue do
-  describe '#do' do
-    context 'stdin.getch y' do
-      it 'transition_to SetFirstCoin' do
-        context = Converter.new(InputValue.new)
-        $stdin.should_receive(:gets).and_return("123\r")
-        expect(context.state.is_a?(InputValue)).to eq true
+  describe '#next' do
+    context 'when enter number' do
+      let(:context) { Converter.new InputValue.new }
+      let(:input) { StringIO.new("123\n") }
+
+      before do
+        $stdin = input
         context.do
         context.next
-        expect(context.state.is_a?(Convert)).to eq true
       end
+
+      subject { context.state }
+      it { is_expected.to be_a Convert }
     end
 
-    context 'stdin.getch n' do
-      it 'transition_to SetFirstCoin' do
-        context = Converter.new(InputValue.new)
-        context.similarNames = []
-        context.similarNames.push 'test'
-        $stdin.should_receive(:gets).and_return('n')
-        expect(context.state.is_a?(InputValue)).to eq true
+    context 'when enter not number' do
+      let(:context) { Converter.new InputValue.new }
+      let(:input) { StringIO.new("lol\n") }
+
+      before do
+        $stdin = input
         context.do
         context.next
-        expect(context.state.is_a?(InputValue)).to eq true
       end
+
+      subject { context.state }
+      it { is_expected.to be_a InputValue }
     end
   end
 end

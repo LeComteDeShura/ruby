@@ -1,28 +1,48 @@
 require_relative '../src/states/input_name'
-require_relative '../src/states/set_first_coin'
+require_relative '../src/states/converter'
 
 describe InputName do
-  describe '#do' do
-    context 'stdin.getch ' do
-      it 'transition_to OutputSimularNames' do
-        context = Converter.new(InputName.new)
-        $stdin.should_receive(:getch).and_return(' ')
-        expect(context.state.is_a?(InputName)).to eq true
+  describe '#next' do
+    context 'when pressed esc' do
+      let(:context) { Converter.new InputName.new }
+      let(:input) { StringIO.new("\e") }
+
+      before do
+        $stdin = input
         context.do
         context.next
-        expect(context.state.is_a?(OutputSimularNames)).to eq true
       end
+
+      subject { context.state }
+      it { is_expected.to be_a Exit }
     end
 
-    context "stdin.getch \r" do
-      it 'transition_to SetFirstCoin' do
-        context = Converter.new(InputName.new)
-        $stdin.should_receive(:getch).and_return("\r")
-        expect(context.state.is_a?(InputName)).to eq true
+    context 'when pressed enter' do
+      let(:context) { Converter.new InputName.new }
+      let(:input) { StringIO.new("\r") }
+
+      before do
+        $stdin = input
         context.do
         context.next
-        expect(context.state.is_a?(SetFirstCoin)).to eq true
       end
+
+      subject { context.state }
+      it { is_expected.to be_a Output }
+    end
+
+    context 'when pressed b key' do
+      let(:context) { Converter.new InputName.new }
+      let(:input) { StringIO.new('b') }
+
+      before do
+        $stdin = input
+        context.do
+        context.next
+      end
+
+      subject { context.state }
+      it { is_expected.to be_a Output }
     end
   end
 end
