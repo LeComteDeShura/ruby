@@ -6,76 +6,62 @@ require 'json'
 require 'fuzzystringmatch'
 
 class Converter < Context
-  attr_accessor :coin, :coins, :coin_names_list, :coin_tickers_list, :similarNames, :value
+  attr_accessor :coin, :coins, :coin_names_list, :coin_tickers_list, :similar_names, :value, :from_coin, :to_coin,
+                :current_coin
 
   def initialize(state)
     super(state)
-    @coins = []
-    @coin = ''
+    @current_coins = []
+    @current_coin = ''
+    @from_coin = ''
+    @to_coin = ''
     @markets = []
-    @similarNames = []
+    @similar_names = []
     @client = CoingeckoRuby::Client.new
-    @coin_names_list = []
-    @namesToTicker = []
+    @current_coin_names_list = []
+    @names_to_ticker = []
     @jarow = FuzzyStringMatch::JaroWinkler.create(:native)
-    puts 'Input ticker: '
   end
 
-  def getSimilarNames
-    @similarNames = {}
-    @coin_names_list.each do |item|
-      score = @jarow.getDistance(@coin, item[0])
-      @similarNames[item[0]] = item[1] if score >= 0.7
+  def find_similar_names
+    @similar_names = {}
+    @current_coin_names_list.each do |item|
+      score = @jarow.getDistance(@current_coin, item[0])
+      @similar_names[item[0]] = item[1] if score >= 0.7
     end
-    @similarNames = @similarNames.compact.to_h
-    @similarNames = @similarNames.sort_by { |_k, v| v }.to_h.keys
-    @similarNames
+    @similar_names = @similar_names.compact.to_h
+    @similar_names = @similar_names.sort_by { |_k, v| v }.to_h.keys
+    @similar_names
   end
 
-  def readDataCoinsLists
+  def read_data_coins_lists
     file = File.read('./data/markets.json')
     @markets = JSON.parse(file)
   end
 
-  def parseCoinsList
-    @coin_names_list = @markets.map { |item| [item['id'], item['market_cap_rank']] }.to_h
-    @namesToTicker = @markets.map { |item| [item['id'], item['symbol']] }.to_h
+  def parse_coins_list
+    @current_coin_names_list = @markets.map { |item| [item['id'], item['market_cap_rank']] }.to_h
+    @names_to_ticker = @markets.map { |item| [item['id'], item['symbol']] }.to_h
   end
 
-  def getCurrentRate(coin)
+  def get_current_rate(coin)
     lol = @client.get_exchange_rate(from: coin, to: 'usd')
     lol[coin]['usd']
   end
 
-  def convert(rate1, rate2, number)
-    ((rate1 / rate2) * number).round(2)
-  end
-
-  def gcoin(c = '')
-    if !@coin.empty? && (c == "\u007F")
-      @coin[-1] = ''
-      return @coin
+  def add_key_to_coin(key = '')
+    if !@current_coin.empty? && (key == "\u007F")
+      @current_coin[-1] = ''
+      return @current_coin
     end
-    return @coin if c == "\n"
+    return @current_coin if key == "\n"
 
-    @coin += c if symbol?(c)
-    @coin
+    @current_coin += key if symbol?(key)
+    @current_coin
   end
 
-  def symbol?(c)
-    return false unless c[/\w/]
-
-    true
-  end
-
-  def isYorN?(c)
-    return false unless c[/[y|n]/]
-
-    true
-  end
-
-  def isNumber?(n)
-    return false unless n[/^[0-9]*[.,]?[0-9]+([eE][+-][0-9]+)?$/]
+  def symbol?(key)
+    return false unless key[/\w/]
 
     true
   end
